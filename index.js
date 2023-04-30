@@ -4,7 +4,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const UserRoute = require("./routes/userRoute");
-const AuthRoute = require("./routes/authRoute");
 
 const app = express();
 app.use(cors());
@@ -13,7 +12,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/user", UserRoute);
-app.use("/auth", AuthRoute);
 
 app.listen(process.env.PORT, () => {
   console.log("Server listining on port " + process.env.PORT);

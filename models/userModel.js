@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       lowercase: true,
+      unique: true,
       validate: [isEmail, "Please enter a valid email"],
     },
     phone: {
