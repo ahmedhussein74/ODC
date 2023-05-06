@@ -22,12 +22,11 @@ const getUser = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  try {
-    const user = new User(req.body);
-    const newUser = await user.save();
-    res.json(newUser);
-  } catch (error) {
-    console.log(error);
+  if (User.findOne({ email: req.body.email })) {
+    res.status(400).json({ message: "Email is already registed" });
+  } else {
+    const user = await User.create(req.body);
+    res.status(200).json(user);
   }
 };
 

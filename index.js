@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Routes
-app.use("/api/user", UserRoute);
+app.use("/api/users", UserRoute);
 
 app.listen(process.env.PORT, () => {
   console.log("Server listining on port " + process.env.PORT);
