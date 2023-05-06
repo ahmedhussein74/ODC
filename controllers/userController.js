@@ -22,7 +22,7 @@ const getUser = async (req, res) => {
 };
 
 const createUser = async (req, res) => {
-  if (User.findOne({ email: req.body.email })) {
+  if (await User.findOne({ email: req.body.email })) {
     res.status(400).json({ message: "Email is already registed" });
   } else {
     const user = await User.create(req.body);
@@ -32,8 +32,8 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const UpdatedUser = await User.findByIdAndUpdate(req.params.id, req.body);
-    res.status(200).json(UpdatedUser);
+    await User.findByIdAndUpdate(req.params.id, req.body);
+    res.status(200).json({ message: "User updated successfully" });
   } catch (error) {
     res.status(400).json({ message: `Error: ${error}` });
   }
@@ -49,7 +49,7 @@ const deleteUser = async (req, res) => {
 };
 
 const signup = async (req, res) => {
-  if (User.findOne({ email: req.body.email })) {
+  if (await User.findOne({ email: req.body.email })) {
     res.status(400).json({ message: "Email is already registed" });
   } else {
     const user = await User.create(req.body);
