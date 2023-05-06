@@ -14,13 +14,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/users", UserRoute);
 
 app.listen(process.env.PORT, () => {
-  console.log("Server listining on port " + process.env.PORT);
+  console.log(`Server listining on port: ${process.env.PORT}`);
   mongoose
     .connect(process.env.URL)
     .then((data) => {
-      console.log("connect to database : ", data.connection.name);
+      console.log(`connect to database: ${data.connection.name}`);
     })
-    .catch((err) => {
-      console.log("Error : ", err);
+    .catch((error) => {
+      console.log(`Error: ${error}`);
     });
 });
