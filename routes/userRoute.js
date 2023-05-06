@@ -17,6 +17,6 @@ router.route("/:id").get(getUser).put(updateUser).delete(deleteUser);
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/forgotPassword", forgotPassword);
-router.put("/resetPassword/:token", resetPassword);
+router.patch("/resetPassword/:token", resetPassword);
 
 module.exports = router;

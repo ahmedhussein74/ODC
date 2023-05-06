@@ -9,14 +9,12 @@ const sendEmail = async (options) => {
       pass: process.env.EMAIL_PASSWORD,
     },
   });
-
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: "ahmedhussein.2072@gmail.com",
     to: options.email,
     subject: options.subject,
     text: options.message,
   };
-
   await transporter.sendMail(mailOptions);
 };
 

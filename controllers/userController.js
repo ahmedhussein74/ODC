@@ -1,8 +1,8 @@
-require("dotenv").config();
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const User = require("../models/UserModel");
-const sendEmail = require("../middleware/email");
+const sendEmail = require("../utils/sendEmail");
 
 const getUsers = async (req, res) => {
   try {
@@ -87,8 +87,10 @@ const forgotPassword = async (req, res) => {
   const resetToken = user.createPasswordResetTokent();
   await user.save({ validateBeforeSave: false });
 
-  const resetURL = `${req.protocol}://${req.get("host")}/api/users/resetPassword/${resetToken}`;
-  const message = `forgot your password? submit a PUT request with your new password to: ${resetURL}. 
+  const resetURL = `${req.protocol}://${req.get(
+    "host"
+  )}/api/users/resetPassword/${resetToken}`;
+  const message = `forgot your password? submit a PATCH request with your new password to: ${resetURL}. 
   \nif you didn't forgot your password, please ignore this email!`;
 
   try {
@@ -100,17 +102,38 @@ const forgotPassword = async (req, res) => {
     res.status(200).json({
       message: "token sent to email",
     });
-  } catch (error) {
+  } catch (err) {
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
     await user.save({ validateBeforeSave: false });
-    return res.status(500).json({
-      message: error,
-    });
+    return res.status(500).json(err);
   }
 };
 
-const resetPassword = async (req, res) => {};
+const resetPassword = async (req, res) => {
+  // get user based on token
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(req.params.token)
+    .digest("hex");
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+  });
+
+  // if token has not expired, and there is user, set new password
+  if (!user) {
+    return res.status(400).json({ message: "token is invalid or has expired" });
+  }
+  user.password = req.body.password;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  // log the user in
+  const token = jwt.sign(user._id);
+  res.status(200).json(token);
+};
 
 module.exports = {
   getUsers,
