@@ -6,18 +6,18 @@ const User = require("../models/UserModel");
 const getUsers = async (req, res) => {
   try {
     const users = await User.find();
-    res.json(users);
+    res.status(200).json(users);
   } catch (error) {
-    console.log(error);
+    res.status(400).json({ message: `Error: ${error}` });
   }
 };
 
 const getUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    res.json(user);
-  } catch (error) {
-    console.log(error);
+    res.status(200).json(user);
+  } catch {
+    res.status(404).json({ message: "User not found" });
   }
 };
 
@@ -32,21 +32,19 @@ const createUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   try {
-    const UpdatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    res.json(UpdatedUser);
+    const UpdatedUser = await User.findByIdAndUpdate(req.params.id, req.body);
+    res.status(200).json(UpdatedUser);
   } catch (error) {
-    console.log(error);
+    res.status(400).json({ message: `Error: ${error}` });
   }
 };
 
 const deleteUser = async (req, res) => {
   try {
-    const DeletedUser = await User.findByIdAndDelete(req.params.id);
-    res.json(DeletedUser);
+    await User.findByIdAndDelete(req.params.id);
+    res.status(200).json({ message: "User is deleted" });
   } catch (error) {
-    console.log(error);
+    res.status(400).json({ message: `Error: ${error}` });
   }
 };
 
