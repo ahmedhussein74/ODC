@@ -23,7 +23,7 @@ const getUser = async (req, res) => {
 
 const createUser = async (req, res) => {
   if (await User.findOne({ email: req.body.email })) {
-    res.status(400).json({ message: "Email is already registed" });
+    res.status(403).json({ message: "Email is already registed" });
   } else {
     const user = await User.create(req.body);
     res.status(200).json(user);
@@ -49,8 +49,11 @@ const deleteUser = async (req, res) => {
 };
 
 const signup = async (req, res) => {
-  if (await User.findOne({ email: req.body.email })) {
-    res.status(400).json({ message: "Email is already registed" });
+  if (
+    (await User.findOne({ email: req.body.email })) ||
+    (await User.findOne({ email: req.body.userName }))
+  ) {
+    res.status(403).json({ message: "Email is already registed" });
   } else {
     const user = await User.create(req.body);
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
@@ -63,13 +66,25 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
-    res.status(400).json({ message: "Wrong Email or Password" });
+    res.status(404).json({ message: "Wrong Email or Password" });
   } else {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
       expiresIn: process.env.JWT_EXPIRE_TIME,
     });
     res.status(200).json({ data: user, token });
   }
+};
+
+const forgotPassword = async (req, res) => {
+  // get user based on posted email
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return res.status(404).json({ message: "This email is not found" });
+  }
+
+  // generate the random reset token
+  const resetToken = user.createPasswordResetTokent();
+  await user.save({ validateBeforeSave: false });
 };
 
 module.exports = {
