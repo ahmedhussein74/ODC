@@ -90,6 +90,7 @@ const forgotPassword = async (req, res) => {
   const resetURL = `${req.protocol}://${req.get(
     "host"
   )}/api/users/resetPassword/${resetToken}`;
+
   const message = `forgot your password? submit a PATCH request with your new password to: ${resetURL}. 
   \nif you didn't forgot your password, please ignore this email!`;
 

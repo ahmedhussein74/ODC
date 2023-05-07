@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const mongoose = require("mongoose");
 const { isEmail } = require("validator");
 
-const userSchema = new mongoose.Schema(
+const childSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       minLength: 8,
     },
+    category: { type: Array, default: [] },
     email: {
       type: String,
       required: true,
@@ -52,25 +53,23 @@ const userSchema = new mongoose.Schema(
         ref: "Operation",
       },
     ],
-    childs: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Child",
-      },
-    ],
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
     passwordResetToken: String,
     passwordResetExpires: Date,
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
+childSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt();
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
-userSchema.methods.createPasswordResetTokent = () => {
+childSchema.methods.createPasswordResetTokent = () => {
   const resetToken = crypto.randomBytes(32).toString("hex");
   this.passwordResetToken = crypto
     .createHash("sha256")
@@ -80,4 +79,4 @@ userSchema.methods.createPasswordResetTokent = () => {
   return resetToken;
 };
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model("Child", childSchema);
